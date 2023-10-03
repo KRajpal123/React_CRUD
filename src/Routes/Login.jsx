@@ -22,24 +22,25 @@ const userApi = "https://shy-teal-goshawk-belt.cyclic.cloud/api/v1/movies";
 const Login = () => {
   const [openDialogBox, setOpenDialogBox] = useState(false);
   const [openDeleteDialogBox, setOpenDeleteDialogBox] = useState(false);
+  const [openEditDailogBox,setOpenEditDailogBox] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
-    email: "",
-    password: "",
+    duration: "",
+    price: "",
   });
   const [data, setData] = useState([]); // copy || storing more users data.
   const [gridAPi, setGridApi] = useState(null); // downloading grid-data
   const [seletedRowData, setSelectedRowData] = useState(null);
   const [apiData, setApiData] = useState([]);
+  
 
   // language translations
 
   const { t } = useTranslation(["common", "login"]);
   const columDef = [
-    { hearderName: t("Name"), field: "name", checkboxSelection: true },
-    { hearderName: t("Email"), field: "duration" },
+    { field: "name", checkboxSelection: true },
+    { field: "duration" },
     {
-      hearderName: t("price"),
       field: "price",
     },
   ];
@@ -63,15 +64,19 @@ const Login = () => {
     }
   };
 
+  // add dailog open
   const onBtnClick = (e) => {
     e.preventDefault();
     setOpenDialogBox(true);
   };
 
+  // add dailog close
   const onBtnClose = (e) => {
     e.preventDefault();
     setOpenDialogBox(false);
-    setOpenDeleteDialogBox(false)
+    setOpenDeleteDialogBox(false);
+    setSelectedRowData(null);
+    setOpenEditDailogBox(false);
   };
 
   const onChangeEventHandler = (e) => {
@@ -82,18 +87,28 @@ const Login = () => {
     }));
   };
 
+  // post user inputs
   const onBtnSave = (e) => {
     e.preventDefault();
     // Add formData to the data array
     setData((prevData) => [...prevData, formData]);
 
-    // Clear the form fields
-    setFormData({
-      name: "",
-      email: "",
-      password: "",
-    })
-    setOpenDialogBox(false);
+    axios.post(userApi,
+      formData
+    ).then((resp) => {
+      console.log(resp, 'succ');
+      getData();
+      // Clear the form fields
+      setFormData({
+        name: "",
+        duration: "",
+        price: "",
+      })
+      setOpenDialogBox(false);
+
+    }).catch((err) => {
+      console.log(err);
+    });
   };
 
   const handleSelection = () => {
@@ -102,9 +117,10 @@ const Login = () => {
       setSelectedRowData(selected);
     }
   };
+  console.log(seletedRowData);
 
   // get data from api 
-  useEffect(() => {
+  const getData = () => {
     axios
       .get(userApi)
       .then((response) => {
@@ -114,16 +130,51 @@ const Login = () => {
       .catch((error) => {
         console.error(error);
       });
+  }
+
+  useEffect(() => {
+    getData();
   }, []);
 
-  // confirmation delete fn;
 
+  // confirmation delete fn;
   const onBtnDelete = (e) => {
     e.preventDefault();
     setOpenDeleteDialogBox(true)
   }
 
+  // deleted item fn
+  const confirmDelete = () => {
+    const userSelectedRowId = seletedRowData[0]._id;
+    axios.delete(`${userApi}/${userSelectedRowId}`)
+      .then((resp) => {
+        console.log(resp, 'succ');
+        // setApiData(apiData)
+        setOpenDeleteDialogBox(false);
+        setSelectedRowData(null);
+        getData();
+      })
+      .catch((err) => {
+        console.log('err', err)
+      })
+  }
 
+// on edit fn dailog
+
+const onEditDailogBox = () => {
+if(seletedRowData && seletedRowData.length === 1){
+  setOpenEditDailogBox(true);
+}
+else{
+  console.log("select the one row data to edit / view")
+}
+}
+
+// onEdit save fn
+const onEditSave = (e) => {
+  e.preventDefault();
+  setOpenEditDailogBox(false)
+}
   return (
     <>
       <Container>
@@ -148,6 +199,7 @@ const Login = () => {
               variant="contained"
               color="success"
               disabled={!(seletedRowData && seletedRowData.length >= 1)}
+              onClick={onEditDailogBox}
             >
               {t("login:Edit")}
             </Button>
@@ -181,29 +233,29 @@ const Login = () => {
               </Grid>
               <Grid item xs={12}>
                 <Input
-                  placeholder={t("Email")}
+                  placeholder={t("Duration")}
                   sx={{
                     backgroundColor: "white",
                     width: "100%",
                     marginBottom: "10px",
                   }}
-                  value={formData.email}
-                  name="email"
+                  value={formData.duration}
+                  name="duration"
                   onChange={onChangeEventHandler}
                 />
               </Grid>
               <Grid item xs={12}>
                 <Input
-                  placeholder={"Password"}
+                  placeholder={"Price"}
                   sx={{
                     backgroundColor: "white",
                     width: "100%",
                     marginBottom: "10px",
                   }}
-                  value={formData.password}
-                  name="password"
+                  value={formData.price}
+                  name="price"
                   onChange={onChangeEventHandler}
-                  type="password"
+                  type="number"
                 />
               </Grid>
             </Grid>
@@ -219,9 +271,19 @@ const Login = () => {
         <DialogContent>Are you sure, do you want delete</DialogContent>
         <DialogActions>
           <Button onClick={onBtnClose}>Cancel</Button>
-          <Button onClick={onBtnDelete}>Delete</Button>
+          <Button onClick={confirmDelete}>Delete</Button>
         </DialogActions>
       </Dialog>
+      
+      {/*=============== Edit  Dialog box ========== */}
+      <Dialog open={openEditDailogBox}>
+        <DialogContent>Are you sure, do you want delete</DialogContent>
+        <DialogActions>
+          <Button onClick={onBtnClose}>Cancel</Button>
+          <Button onClick={onEditSave}>Save</Button>
+        </DialogActions>
+      </Dialog>
+
       <Grid container mt={5}>
         <Grid item xs={2}></Grid>
         <Grid
