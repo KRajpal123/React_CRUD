@@ -1,0 +1,8 @@
+{
+    "name":"Name",
+    "email":"Email",
+    "password" : "Password",
+    "Add" : "ADD",
+    "Delete":"Delete",
+    "Edit":"Edit"
+}
