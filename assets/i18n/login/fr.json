@@ -1,0 +1,8 @@
+{
+    "name":"nom",
+    "email":"e-mail",
+    "password":"mot de passe",
+    "Add": "ajouter",
+    "Delete": "supprimer",
+    "Edit": "modifier"
+}
