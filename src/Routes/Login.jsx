@@ -171,11 +171,11 @@ const Login = () => {
   const onEditSave = (e) => {
     e.preventDefault();
     const editRowData = seletedRowData[0]._id;
-
+    console.log('FORM DTA', editRowData)
     axios.patch(`${userApi}/${editRowData}`, formData)
       .then((res) => {
         console.log("success", res.data, res.status);
-        if(res.status === "success"){
+        if(res.status === 200){
           getData();
         }
        
