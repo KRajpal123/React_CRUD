@@ -171,14 +171,14 @@ const Login = () => {
     e.preventDefault();
     const editRowData = seletedRowData[0]._id;
 
-    axios.patch(`${userApi}/${editRowData}`,formData)
-    .then((res) => {
-      console.log("success",res);
-      getData();
-    })
-    .catch((err) => {
-      console.log(err);
-    })
+    axios.patch(`${userApi}/${editRowData}`, formData)
+      .then((res) => {
+        console.log("success", res);
+        getData();
+      })
+      .catch((err) => {
+        console.log(err);
+      })
 
     setOpenEditDailogBox(false);
   }
