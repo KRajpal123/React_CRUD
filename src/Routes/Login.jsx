@@ -118,6 +118,7 @@ const Login = () => {
 
   // get data from api 
   const getData = () => {
+    console.log('get data called')
     axios
       .get(userApi)
       .then((response) => {
