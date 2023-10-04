@@ -174,8 +174,11 @@ const Login = () => {
 
     axios.patch(`${userApi}/${editRowData}`, formData)
       .then((res) => {
-        console.log("success", res);
-        getData();
+        console.log("success", res.data, res.status);
+        if(res.status === "success"){
+          getData();
+        }
+       
       })
       .catch((err) => {
         console.log(err);
