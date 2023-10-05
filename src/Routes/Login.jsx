@@ -168,24 +168,33 @@ const Login = () => {
   }
 
   // onEdit save fn
-  const onEditSave = (e) => {
+  const onEditSave = async (e) => {
     e.preventDefault();
-    const editRowData = seletedRowData[0]._id;
-    console.log('FORM DTA', editRowData)
-    axios.patch(`${userApi}/${editRowData}`, formData)
-      .then((res) => {
-        console.log("success", res.data, res.status);
-        if(res.status === 200){
-          getData();
+    
+    if (seletedRowData && seletedRowData.length > 0) {
+      try {
+        const editRowData = seletedRowData[0]._id;
+        console.log('FORM DTA', editRowData, formData);
+  
+        // Perform the patch request
+        const response = await axios.patch(`${userApi}/${editRowData}`, formData);
+  
+        console.log("Success", response.data, response.status);
+        
+        if (response.status === 200) {
+          // Wait for the patch request to complete, then fetch updated data
+          await getData();
         }
-       
-      })
-      .catch((err) => {
-        console.log(err);
-      })
-
-    setOpenEditDailogBox(false);
-  }
+      } catch (error) {
+        console.error("Error", error);
+      }
+  
+      setOpenEditDailogBox(false);
+    } else {
+      console.error("No selected row data to edit.");
+    }
+  };
+  
 
   return (
     <>
